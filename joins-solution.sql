@@ -53,5 +53,27 @@
 
 -- STRETCH
     -- How much was the total cost for each order?
+        SELECT order_id, order_date, SUM (unit_price*quantity) AS total_order_price
+        FROM orders 
+        JOIN line_items ON orders.id=line_items.order_id
+        JOIN products ON line_items.product_id=products.id
+        GROUP BY order_id, order_date
+        ORDER BY order_id ASC;
     -- How much has each customer spent in total?
+        SELECT customers.first_name, customers.last_name, SUM (unit_price*quantity) AS total_order_price
+        FROM customers 
+        JOIN addresses ON addresses.customer_id=customers.id
+        LEFT JOIN orders ON orders.address_id=addresses.id
+        LEFT JOIN line_items ON orders.id=line_items.order_id
+        LEFT JOIN products ON line_items.product_id=products.id
+        GROUP BY customers.first_name, customers.last_name
+        ORDER BY customers.last_name ASC;
     -- How much has each customer spent in total? Customers who have spent $0 should still show up in the table. It should say 0, not NULL (research coalesce).
+        SELECT customers.first_name, customers.last_name, SUM (COALESCE((unit_price*quantity),0)) AS total_order_price
+        FROM customers 
+        JOIN addresses ON addresses.customer_id=customers.id
+        LEFT JOIN orders ON orders.address_id=addresses.id
+        LEFT JOIN line_items ON orders.id=line_items.order_id
+        LEFT JOIN products ON line_items.product_id=products.id
+        GROUP BY customers.first_name, customers.last_name
+        ORDER BY customers.last_name ASC;
